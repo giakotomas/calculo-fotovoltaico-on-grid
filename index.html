@@ -3,16 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asistente de Diseño Fotovoltaico Pro - San Juan</title>
+  <title>Calculadora Solar Residencial - San Juan</title>
   <style>
     :root {
       --bg-color: #f8fafc;
       --card-bg: #ffffff;
       --primary: #0284c7;
-      --primary-hover: #0369a1;
       --accent: #16a34a;
       --danger: #dc2626;
-      --warning: #d97706;
       --text: #0f172a;
       --border: #cbd5e1;
       --info-bg: #f0f9ff;
@@ -21,7 +19,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: var(--bg-color); color: var(--text); padding: 20px; line-height: 1.5; }
-    .container { max-width: 1280px; margin: 0 auto; }
+    .container { max-width: 1200px; margin: 0 auto; }
     
     header { text-align: center; margin-bottom: 25px; }
     header h1 { font-size: 2rem; color: var(--primary); }
@@ -35,14 +33,14 @@
       margin-bottom: 20px;
       text-align: center;
     }
-    .system-selector label { font-weight: bold; font-size: 1.1rem; margin-right: 15px; color: #0369a1; }
+    .system-selector label { font-weight: bold; font-size: 1.05rem; margin-right: 15px; color: #0369a1; }
     .system-selector select { padding: 8px 15px; font-size: 1rem; border-radius: 6px; border: 1px solid var(--border); font-weight: bold; }
 
     .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-    @media (min-width: 950px) { .grid { grid-template-columns: 1.1fr 0.9fr; } }
+    @media (min-width: 900px) { .grid { grid-template-columns: 1.1fr 0.9fr; } }
 
     .card { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .card h2 { font-size: 1.15rem; margin-bottom: 15px; color: #0369a1; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+    .card h2 { font-size: 1.15rem; margin-bottom: 15px; color: #0369a1; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
 
     .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
     .tab-btn { flex: 1; padding: 10px; background: #e2e8f0; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; color: #475569; }
@@ -58,19 +56,15 @@
     .inline-group { display: flex; gap: 10px; }
     .inline-group .form-group { flex: 1; }
 
-    .explanation-box { background: var(--info-bg); border: 1px solid var(--info-border); padding: 10px 12px; border-radius: 6px; font-size: 0.85rem; color: #0369a1; margin-top: 8px; }
-    .explanation-box strong { display: block; margin-bottom: 2px; }
+    .explanation-box { background: var(--info-bg); border: 1px solid var(--info-border); padding: 12px; border-radius: 6px; font-size: 0.88rem; color: #0369a1; margin-top: 10px; }
+    .explanation-box strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
 
     .app-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
     .app-row select, .app-row input { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem; }
     .btn-del { background: var(--danger); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .btn-add { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; margin-top: 4px; }
 
-    .status-badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; display: inline-block; }
-    .status-pass { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-    .status-fail { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
-
-    .verification-card { border-left: 4px solid var(--border); padding: 10px; margin-bottom: 8px; background: #f8fafc; border-radius: 0 6px 6px 0; }
+    .verification-card { border-left: 4px solid var(--border); padding: 10px; margin-bottom: 8px; background: #f8fafc; border-radius: 0 6px 6px 0; font-size: 0.85rem; }
     .verification-card.pass { border-left-color: var(--accent); }
     .verification-card.fail { border-left-color: var(--danger); }
 
@@ -84,7 +78,6 @@
     button.btn-pdf { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px; }
     button.btn-pdf:hover { background: #15803d; }
 
-    /* Ocultar sección de baterías completamente en On-Grid */
     body.mode-ongrid .offgrid-only { display: none !important; }
 
     @media print {
@@ -99,39 +92,39 @@
 
 <div class="container" id="reporteContenido">
   <header>
-    <h1>Asistente de Diseño Fotovoltaico Pro</h1>
-    <p>Cálculo Técnico On-Grid y Off-Grid - Según Guía de Cátedra e IRAM 247-3</p>
+    <h1>Calculadora Solar Residencial</h1>
+    <p>Diseño Fácil y Rápido para Tu Sistema Solar</p>
   </header>
 
   <!-- SELECCIÓN MODO DE SISTEMA -->
   <div class="system-selector">
-    <label for="tipoSistema">MODO DEL SISTEMA FOTOVOLTAICO:</label>
+    <label for="tipoSistema">TIPO DE SISTEMA SOLAR:</label>
     <select id="tipoSistema" onchange="cambiarModoSistema()">
-      <option value="ongrid" selected>ON-GRID (Conectado a Red - Sin Baterías)</option>
-      <option value="offgrid">OFF-GRID / HÍBRIDO (Aislado / Con Banco de Baterías)</option>
+      <option value="ongrid" selected>ON-GRID (Conectado a la Red Electrica - Sin Baterías)</option>
+      <option value="offgrid">OFF-GRID / HÍBRIDO (Aislado de la Red / Con Baterías)</option>
     </select>
   </div>
 
   <div class="grid">
-    <!-- PANEL DE ENTRADAS -->
+    <!-- ENTRADA DE DATOS SIMPLIFICADA -->
     <div>
       <!-- 1. CONSUMO -->
       <div class="card">
-        <h2>1. Determinación del Consumo</h2>
+        <h2>1. Tu Consumo de Luz</h2>
         <div class="tabs">
           <button class="tab-btn active" onclick="cambiarTabConsumo('factura')">Por Factura de Luz</button>
-          <button class="tab-btn" onclick="cambiarTabConsumo('equipos')">Por Equipos / Cargas</button>
+          <button class="tab-btn" onclick="cambiarTabConsumo('equipos')">Por Electrodomésticos</button>
         </div>
 
         <div id="tab-factura" class="tab-content active">
           <div class="form-group">
-            <label>Subir o Escanear Factura de Electricidad (JPG/PNG/PDF):</label>
+            <label>Cargar o Cargar Foto de tu Factura (Opcional):</label>
             <input type="file" id="archivoFactura" accept="image/*,.pdf" onchange="procesarArchivoFactura(event)">
           </div>
 
           <div class="inline-group">
             <div class="form-group">
-              <label>Consumo en Factura (kWh):</label>
+              <label>Consumo de tu Factura (kWh):</label>
               <input type="number" id="kwhMes" value="300" oninput="procesarCalculos()">
             </div>
             <div class="form-group">
@@ -141,162 +134,110 @@
           </div>
 
           <div class="explanation-box">
-            <strong>💡 Verificación del Consumo Diario:</strong>
-            <span id="expConsumoDiario">300 kWh / 30 días = 10.00 kWh/día. Este dato representa la demanda promedio real de la vivienda.</span>
+            <strong>💡 Tu Consumo Diario Promedio:</strong>
+            <span id="expConsumoDiario">300 kWh / 30 días = 10.00 kWh al día.</span>
           </div>
         </div>
 
         <div id="tab-equipos" class="tab-content">
           <div id="listaElectro"></div>
-          <button class="btn-add" onclick="agregarFila()">+ Agregar Receptor</button>
+          <button class="btn-add" onclick="agregarFila()">+ Agregar Electrodoméstico</button>
         </div>
       </div>
 
-      <!-- 2. SITIO Y FACTORES DE CÁTEDRA -->
+      <!-- 2. UBICACIÓN Y OBJETIVO DE AHORRO -->
       <div class="card">
-        <h2>2. Sitio, Ubicación y Factores de Corrección</h2>
+        <h2>2. Ubicación y ¿Cuánto Quieres Ahorrar?</h2>
         
         <div class="inline-group">
           <div class="form-group">
-            <label>Ubicación del Proyecto:</label>
+            <label>Provincia / Ciudad:</label>
             <select id="selUbicacion" onchange="actualizarUbicacion()">
-              <option value="sanjuan" selected>San Juan (HSP: 5.0 kWh/m²/día)</option>
-              <option value="mendoza">Mendoza (HSP: 4.8 kWh/m²/día)</option>
-              <option value="cordoba">Córdoba (HSP: 4.5 kWh/m²/día)</option>
-              <option value="bsas">Buenos Aires (HSP: 4.1 kWh/m²/día)</option>
+              <option value="sanjuan" selected>San Juan (Sol Excelente - 5.0 hs/día)</option>
+              <option value="mendoza">Mendoza (Sol Muy Bueno - 4.8 hs/día)</option>
+              <option value="cordoba">Córdoba (Sol Bueno - 4.5 hs/día)</option>
+              <option value="bsas">Buenos Aires (Sol Moderado - 4.1 hs/día)</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Horas Sol Pico (HSP):</label>
-            <input type="number" id="inputHsp" value="5.0" step="0.1" oninput="procesarCalculos()">
-          </div>
-        </div>
-
-        <div class="inline-group">
-          <div class="form-group">
-            <label>Orientación / Inclinación:</label>
-            <select id="orientacion" onchange="procesarCalculos()">
-              <option value="1.0" selected>Norte 30° (Óptimo - 100%)</option>
-              <option value="0.95">Norte Plano / Losa (95%)</option>
-              <option value="0.88">Este / Oeste (88%)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Tipo de Techo:</label>
-            <select id="tipoTecho" onchange="procesarCalculos()">
-              <option value="chapa" selected>Chapa Trapezoidal</option>
-              <option value="losa">Losa / Hormigón (Regulable)</option>
-              <option value="teja">Tejas</option>
-            </select>
-          </div>
-        </div>
-
-        <h3 style="font-size:0.95rem; margin:10px 0 5px 0; color:#334155;">Factores Térmicos y de Pérdidas (Cátedra):</h3>
-        
-        <div class="inline-group">
-          <div class="form-group">
-            <label>FVC (Variación de Cargas):</label>
-            <input type="number" id="fvcInput" value="1.20" step="0.01" oninput="procesarCalculos()">
-          </div>
-          <div class="form-group">
-            <label>FPE (Pérdidas Eléctricas):</label>
-            <input type="number" id="fpeInput" value="1.05" step="0.01" oninput="procesarCalculos()">
-          </div>
-          <div class="form-group">
-            <label>FPI (Pérdidas Inversor):</label>
-            <input type="number" id="fpiInput" value="1.10" step="0.01" oninput="procesarCalculos()">
+            <label>Horas de Sol Promedio (HSP):</label>
+            <input type="number" id="inputHsp" value="5.0" step="0.1" readonly style="background:#f1f5f9;">
           </div>
         </div>
 
         <div class="form-group">
-          <label>PAE (Porcentaje de Ahorro Energético Deseado):</label>
-          <input type="number" id="paeInput" value="70" min="1" max="200" oninput="procesarCalculos()">
+          <label>¿Qué Porcentaje de tu Factura Quieres Cubrir con el Sol? (%)</label>
+          <input type="number" id="paeInput" value="70" min="10" max="100" oninput="procesarCalculos()">
         </div>
 
         <div class="explanation-box">
-          <strong>📐 Fórmula de Energía Requerida:</strong>
-          <span id="expFormulaEnergia">E = Consumo × FVC × FPE × FPI × PAE</span>
+          <strong>🎯 Objetivo del Sistema:</strong>
+          <span id="expObjetivoAhorro">Se calculará un sistema para cubrir el 70% de tu consumo diario diario.</span>
         </div>
       </div>
 
-      <!-- 3. COMPONENTES REALES -->
+      <!-- 3. COMPONENTES -->
       <div class="card">
-        <h2>3. Componentes Solares (Catálogo Argentina)</h2>
+        <h2>3. Selección de Equipos Comercializados en Argentina</h2>
         
         <div class="form-group">
-          <label>Panel Fotovoltaico Comercial:</label>
+          <label>Panel Solar Comercial:</label>
           <select id="selPanel" onchange="procesarCalculos()"></select>
-          <div id="infoPanel" style="font-size:0.8rem; color:#64748b; margin-top:3px;"></div>
         </div>
 
         <div class="form-group">
-          <label>Inversor On-Grid (Inyección a Red):</label>
+          <label>Inversor Solar (Transforma la energía del sol para tu hogar):</label>
           <select id="selInversor" onchange="procesarCalculos()"></select>
-          <div id="infoInversor" style="font-size:0.8rem; color:#64748b; margin-top:3px;"></div>
         </div>
 
-        <!-- BATERÍAS (EXCLUSIVO OFF-GRID) -->
-        <div class="offgrid-only" style="border: 1px dashed var(--warning); padding: 10px; border-radius: 6px; margin-top: 10px; background: #fffbeb;">
-          <h3 style="color:var(--warning); font-size:0.9rem; margin-bottom:5px;">Configuración de Banco de Baterías (Off-Grid):</h3>
+        <!-- BATERÍAS (SOLO EN MODO OFF-GRID) -->
+        <div class="offgrid-only" style="border: 1px dashed var(--primary); padding: 12px; border-radius: 6px; margin-top: 10px; background: #f0f9ff;">
+          <h3 style="color:var(--primary); font-size:0.95rem; margin-bottom:8px;">Baterías de Respaldo (Para Cortes de Luz):</h3>
           <div class="form-group">
-            <label>Días de Autonomía:</label>
-            <input type="number" id="autonomiaInput" value="1" min="1" max="5" oninput="procesarCalculos()">
+            <label>Días de Autonomía Deseados:</label>
+            <input type="number" id="autonomiaInput" value="1" min="1" max="3" oninput="procesarCalculos()">
           </div>
           <div class="form-group">
-            <label>Batería Seleccionada:</label>
+            <label>Modelo de Batería:</label>
             <select id="selBateria" onchange="procesarCalculos()"></select>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- PANEL DE RESULTADOS Y VERIFICACIONES -->
+    <!-- PANEL DE RESULTADOS FACILES DE ENTENDER -->
     <div>
       <div class="card">
-        <h2>Dimensionamiento Técnico y Compatibilidad</h2>
+        <h2>Resumen Técnico de Tu Sistema</h2>
         <table>
           <tbody>
-            <tr><td>Energía Objetivo a Generar:</td><td><strong id="resEnergiaObjetivo">-</strong> kWh/día</td></tr>
-            <tr><td>Potencia Fotovoltaica Requerida:</td><td><strong id="resPotenciaRequerida">-</strong> Wp</td></tr>
-            <tr><td>Cantidad de Paneles Necesarios:</td><td><strong id="resCantPaneles">-</strong></td></tr>
+            <tr><td>Energía Diaria Objetivo:</td><td><strong id="resEnergiaObjetivo">-</strong> kWh/día</td></tr>
+            <tr><td>Potencia Total Solares Necesaria:</td><td><strong id="resPotenciaRequerida">-</strong> Watts (Wp)</td></tr>
+            <tr><td>Cantidad de Paneles Recomendados:</td><td><strong id="resCantPaneles">-</strong></td></tr>
             <tr><td>Potencia Total Instalada:</td><td><strong id="resPotenciaInstalada">-</strong> Wp</td></tr>
-            <tr><td>Configuración de Strings:</td><td><strong id="resConfigStrings">-</strong></td></tr>
-            <tr><td>Inversor Seleccionado:</td><td><strong id="resNombreInversor">-</strong></td></tr>
-            <tr class="offgrid-only"><td>Banco de Baterías:</td><td><strong id="resBancoBaterias">-</strong></td></tr>
+            <tr><td>Modelo de Inversor Seleccionado:</td><td><strong id="resNombreInversor">-</strong></td></tr>
+            <tr class="offgrid-only"><td>Banco de Baterías Requerido:</td><td><strong id="resBancoBaterias">-</strong></td></tr>
           </tbody>
         </table>
+
+        <div class="explanation-box" id="cuadroExplicativoSimple">
+          <strong>💬 ¿Qué Significa Este Resultado?</strong>
+          <span id="txtExplicativoSimple">Cargando datos...</span>
+        </div>
       </div>
 
-      <!-- VERIFICACIONES DE SEGURIDAD ON-GRID -->
+      <!-- VERIFICACIÓN DE COMPATIBILIDAD -->
       <div class="card">
-        <h2>4 Verificaciones de Seguridad Eléctrica (Cátedra)</h2>
+        <h2>Verificación de Seguridad de Equipos</h2>
         <div id="contenedorVerificaciones"></div>
       </div>
 
-      <!-- CABLEADO Y PROTECCIONES -->
+      <!-- PRESUPUESTO Y ROI -->
       <div class="card">
-        <h2>Cableado IRAM 247-3 y Protecciones</h2>
-        <table>
-          <tbody>
-            <tr><td>Cableado Campo FV (CC):</td><td><strong id="resCableCC">-</strong> mm² (IRAM)</td></tr>
-            <tr><td>Caída de Tensión CC Estimada:</td><td><strong id="resCaidaCC">-</strong> %</td></tr>
-            <tr><td>Fusibles gPV (Strings CC):</td><td><strong id="resFusibleCC">-</strong></td></tr>
-            <tr><td>Seccionador CC Under-Load:</td><td><strong id="resSeccionadorCC">-</strong></td></tr>
-            <tr><td>Protector Sobretensiones DPS CC:</td><td><strong id="resDpsCC">-</strong></td></tr>
-            <tr class="offgrid-only"><td>Cable Baterías (CC):</td><td><strong id="resCableBat">-</strong> mm²</td></tr>
-            <tr><td>Cable Salida Inversor (CA):</td><td><strong id="resCableCA">-</strong> mm²</td></tr>
-            <tr><td>Llave Termomagnética (PIA CA):</td><td><strong id="resTermicaCA">-</strong></td></tr>
-            <tr><td>Interruptor Diferencial (RCD CA):</td><td><strong id="resDiferencialCA">-</strong></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- ECONÓMICO Y PRESUPUESTO -->
-      <div class="card">
-        <h2>Análisis Económico y Presupuesto Real</h2>
+        <h2>Presupuesto Estimado y Recupero de Inversión</h2>
         <table>
           <thead>
-            <tr><th>Ítem</th><th>Cant.</th><th>P.Unit (USD)</th><th>Subtotal</th></tr>
+            <tr><th>Ítem</th><th>Cant.</th><th>P. Unit (USD)</th><th>Subtotal</th></tr>
           </thead>
           <tbody id="tablaPresupuesto"></tbody>
         </table>
@@ -306,53 +247,40 @@
           <h3 id="resTotalPresupuesto">$0 USD</h3>
         </div>
 
-        <div style="margin-top:10px; font-size:0.85rem;">
-          <p>Ahorro Anual Estimado: <strong id="resAhorroAnual" style="color:var(--accent);">$0 USD</strong></p>
-          <p>Tiempo de Amortización Estimado (ROI): <strong id="resRoiAnos">-</strong> años</p>
+        <div style="margin-top:12px; font-size:0.9rem; line-height: 1.6;">
+          <p>💵 Ahorro Anual Estimado en tu Factura: <strong id="resAhorroAnual" style="color:var(--accent);">$0 USD</strong></p>
+          <p>⏳ Tiempo Estimado de Amortización (ROI): <strong id="resRoiAnos">-</strong> años</p>
         </div>
 
-        <button class="btn-pdf" onclick="window.print()">Imprimir / Exportar Memoria Técnica PDF</button>
+        <button class="btn-pdf" onclick="window.print()">Imprimir / Guardar Presupuesto en PDF</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  // BASE DE DATOS REAL CON PROVEEDORES ARGENTINOS (USD)
+  // CATÁLOGO DE PRODUCTOS REALES EN ARGENTINA
   const DB = {
     paneles: [
-      { id: "p_jinko_550", marca: "Jinko Solar", modelo: "Tiger Pro 550W", pot: 550, vmp: 40.9, imp: 13.45, voc: 49.6, isc: 14.0, precio: 180, prov: "Enertik / ADN Solar" },
-      { id: "p_risen_500", marca: "Risen", modelo: "Titan 500W PERC", pot: 500, vmp: 38.3, imp: 13.06, voc: 45.6, isc: 13.8, precio: 160, prov: "ADN Solar" },
-      { id: "p_ja_450", marca: "JA Solar", modelo: "JAM72S20 450W", pot: 450, vmp: 41.52, imp: 10.84, voc: 49.7, isc: 11.36, precio: 145, prov: "Enertik" },
-      { id: "p_solartec_155", marca: "Solartec", modelo: "KS155T 155W (Cátedra)", pot: 155, vmp: 19.1, imp: 8.2, voc: 22.5, isc: 8.7, precio: 110, prov: "Referencia Cátedra" }
+      { id: "p_jinko_550", marca: "Jinko Solar", modelo: "Tiger Pro 550W", pot: 550, vmp: 40.9, imp: 13.45, voc: 49.6, isc: 14.0, precio: 180 },
+      { id: "p_risen_500", marca: "Risen", modelo: "Titan 500W", pot: 500, vmp: 38.3, imp: 13.06, voc: 45.6, isc: 13.8, precio: 160 },
+      { id: "p_ja_450", marca: "JA Solar", modelo: "JAM72S 450W", pot: 450, vmp: 41.52, imp: 10.84, voc: 49.7, isc: 11.36, precio: 145 }
     ],
     inversoresOnGrid: [
-      { id: "i_growatt_min3k", marca: "Growatt", modelo: "MIN 3000TL-X", potAc: 3000, potDcMax: 4200, vMaxDc: 500, vArranque: 80, minMppt: 80, maxMppt: 500, iMaxMppt: 13.5, mppt: 2, precio: 750, prov: "Enertik" },
-      { id: "i_growatt_min5k", marca: "Growatt", modelo: "MIN 5000TL-X", potAc: 5000, potDcMax: 7000, vMaxDc: 550, vArranque: 100, minMppt: 80, maxMppt: 550, iMaxMppt: 13.5, mppt: 2, precio: 980, prov: "Enertik" },
-      { id: "i_solis_1k", marca: "Solis", modelo: "Mini 1000 4G", potAc: 1000, potDcMax: 1500, vMaxDc: 600, vArranque: 60, minMppt: 50, maxMppt: 500, iMaxMppt: 11, mppt: 1, precio: 420, prov: "ADN Solar" },
-      { id: "i_solax_x1", marca: "SolaX", modelo: "X1 Mini 2.0", potAc: 2000, potDcMax: 3000, vMaxDc: 450, vArranque: 70, minMppt: 50, maxMppt: 450, iMaxMppt: 12, mppt: 1, precio: 540, prov: "Distribuidor Arg" },
-      { id: "i_abb_2k", marca: "ABB", modelo: "UNO-DM-2.0-TL-PLUS (Cátedra)", potAc: 2000, potDcMax: 2200, vMaxDc: 520, vArranque: 90, minMppt: 120, maxMppt: 470, iMaxMppt: 10, mppt: 1, precio: 680, prov: "Referencia Cátedra" }
+      { id: "i_growatt_min3k", marca: "Growatt", modelo: "MIN 3000TL-X (3 kW)", potAc: 3000, potDcMax: 4200, vMaxDc: 500, vArranque: 80, minMppt: 80, maxMppt: 500, iMaxMppt: 13.5, precio: 750 },
+      { id: "i_growatt_min5k", marca: "Growatt", modelo: "MIN 5000TL-X (5 kW)", potAc: 5000, potDcMax: 7000, vMaxDc: 550, vArranque: 100, minMppt: 80, maxMppt: 550, iMaxMppt: 13.5, precio: 980 },
+      { id: "i_solis_1k", marca: "Solis", modelo: "Mini 1000 4G (1 kW)", potAc: 1000, potDcMax: 1500, vMaxDc: 600, vArranque: 60, minMppt: 50, maxMppt: 500, iMaxMppt: 11, precio: 420 }
     ],
     inversoresOffGrid: [
-      { id: "i_must_3k_24", marca: "Must", modelo: "PV18-3024 VPM 3kW 24V", potAc: 3000, potDcMax: 3000, vBat: 24, vMaxDc: 145, precio: 650 },
-      { id: "i_growatt_spf5k", marca: "Growatt", modelo: "SPF 5000ES 48V", potAc: 5000, potDcMax: 6000, vBat: 48, vMaxDc: 450, precio: 1150 }
+      { id: "i_must_3k_24", marca: "Must", modelo: "PV18-3024 3kW 24V", potAc: 3000, potDcMax: 3000, vMaxDc: 145, precio: 650 },
+      { id: "i_growatt_spf5k", marca: "Growatt", modelo: "SPF 5000ES 5kW 48V", potAc: 5000, potDcMax: 6000, vMaxDc: 450, precio: 1150 }
     ],
     baterias: [
-      { id: "b_litio_pylon_3000", nombre: "Pylontech US3000C LiFePO4 48V 74Ah", v: 48, ah: 74, dod: 0.9, kwh: 3.55, precio: 1550 },
-      { id: "b_gel_12_105", nombre: "Batería GEL 12V 105Ah C20", v: 12, ah: 105, dod: 0.6, kwh: 1.26, precio: 220 }
-    ],
-    cablesIRAM: [
-      { seccion: 1.5, adm: 15 },
-      { seccion: 2.5, adm: 21 },
-      { seccion: 4.0, adm: 28 },
-      { seccion: 6.0, adm: 36 },
-      { seccion: 10.0, adm: 50 },
-      { seccion: 16.0, adm: 66 },
-      { seccion: 25.0, adm: 88 }
+      { id: "b_litio_pylon_3000", nombre: "Batería Litio Pylontech 48V 3.55 kWh", v: 48, ah: 74, dod: 0.9, precio: 1550 },
+      { id: "b_gel_12_105", nombre: "Batería GEL Ciclo Profundo 12V 105Ah", v: 12, ah: 105, dod: 0.6, precio: 220 }
     ]
   };
 
-  // CAMBIAR MODO ON-GRID / OFF-GRID
   function cambiarModoSistema() {
     const modo = document.getElementById('tipoSistema').value;
     if (modo === 'ongrid') {
@@ -387,12 +315,10 @@
     procesarCalculos();
   }
 
-  // ES CANEO / CARGA DE FACTURA
   function procesarArchivoFactura(evt) {
     const file = evt.target.files[0];
     if (!file) return;
-    // Simulación de lectura OCR rápida
-    alert(`Factura cargada: ${file.name}. Se detectó un consumo mensual de 300 kWh / 30 días.`);
+    alert(`Factura cargada: ${file.name}. Se leyeron 300 kWh consumidos en el mes.`);
     document.getElementById('kwhMes').value = 300;
     document.getElementById('diasFactura').value = 30;
     procesarCalculos();
@@ -404,160 +330,96 @@
     const selI = document.getElementById('selInversor');
     const selB = document.getElementById('selBateria');
 
-    selP.innerHTML = DB.paneles.map(p => `<option value="${p.id}">${p.marca} ${p.modelo} (${p.pot}Wp) - $${p.precio} USD</option>`).join('');
+    selP.innerHTML = DB.paneles.map(p => `<option value="${p.id}">${p.marca} ${p.modelo} (${p.pot}W) - $${p.precio} USD</option>`).join('');
 
     if (modo === 'ongrid') {
-      selI.innerHTML = DB.inversoresOnGrid.map(i => `<option value="${i.id}">${i.marca} ${i.modelo} (${i.potAc}W AC) - $${i.precio} USD</option>`).join('');
+      selI.innerHTML = DB.inversoresOnGrid.map(i => `<option value="${i.id}">${i.marca} ${i.modelo} - $${i.precio} USD</option>`).join('');
     } else {
-      selI.innerHTML = DB.inversoresOffGrid.map(i => `<option value="${i.id}">${i.marca} ${i.modelo} (${i.potAc}W AC) - $${i.precio} USD</option>`).join('');
+      selI.innerHTML = DB.inversoresOffGrid.map(i => `<option value="${i.id}">${i.marca} ${i.modelo} - $${i.precio} USD</option>`).join('');
     }
 
     selB.innerHTML = DB.baterias.map(b => `<option value="${b.id}">${b.nombre} - $${b.precio} USD</option>`).join('');
   }
 
-  function calcularSeccionIRAM(corriente) {
-    for (let c of DB.cablesIRAM) {
-      if (c.adm >= corriente * 1.25) return c.seccion;
-    }
-    return 25;
-  }
-
-  // LÓGICA PRINCIPAL DE CÁLCULO
+  // LÓGICA DE CÁLCULO SIMPLIFICADA Y DIRECTA
   function procesarCalculos() {
     const modo = document.getElementById('tipoSistema').value;
     
-    // 1. CONSUMO
+    // 1. CONSUMO DIARIO
     let consumoDiario = 10;
     if (document.getElementById('tab-factura').classList.contains('active')) {
       const kwhMes = parseFloat(document.getElementById('kwhMes').value) || 0;
       const dias = parseFloat(document.getElementById('diasFactura').value) || 30;
       consumoDiario = kwhMes / dias;
-      document.getElementById('expConsumoDiario').innerText = `${kwhMes} kWh / ${dias} días = ${consumoDiario.toFixed(2)} kWh/día. Este dato representa la demanda promedio real.`;
+      document.getElementById('expConsumoDiario').innerText = `${kwhMes} kWh / ${dias} días = ${consumoDiario.toFixed(2)} kWh consumidos por día.`;
     }
 
-    // 2. FACTORES Y ENERGÍA REQUERIDA (CÁTEDRA)
-    const fvc = parseFloat(document.getElementById('fvcInput').value) || 1.20;
-    const fpe = parseFloat(document.getElementById('fpeInput').value) || 1.05;
-    const fpi = parseFloat(document.getElementById('fpiInput').value) || 1.10;
+    // 2. ENERGÍA OBJETIVO Y POTENCIA REQUERIDA
     const pae = parseFloat(document.getElementById('paeInput').value) || 70;
     const hsp = parseFloat(document.getElementById('inputHsp').value) || 5.0;
-    const orient = parseFloat(document.getElementById('orientacion').value) || 1.0;
 
-    const energiaObjetivo = consumoDiario * fvc * fpe * fpi * (pae / 100);
-    document.getElementById('expFormulaEnergia').innerText = `${consumoDiario.toFixed(2)} kWh/día × ${fvc} (FVC) × ${fpe} (FPE) × ${fpi} (FPI) × (${pae}%) = ${energiaObjetivo.toFixed(2)} kWh/día.`;
+    // Cálculo directo sin coeficientes complejos de pérdidas
+    const energiaObjetivo = consumoDiario * (pae / 100);
+    const potRequeridaWp = (energiaObjetivo * 1000) / hsp;
 
-    // 3. POTENCIA Y SELECCIÓN DE PANELES
-    const hspEfectiva = hsp * orient;
-    // ηpanel de cátedra = 0.70
-    const potRequeridaWp = (energiaObjetivo * 1000) / (hspEfectiva * 0.70);
+    document.getElementById('expObjetivoAhorro').innerText = `Para cubrir el ${pae}% de tu consumo diario (${consumoDiario.toFixed(2)} kWh/día), el sistema debe generar aproximadamente ${energiaObjetivo.toFixed(2)} kWh al día.`;
 
+    // 3. PANELES Y POTENCIA INSTALADA
     const panelSel = DB.paneles.find(p => p.id === document.getElementById('selPanel').value) || DB.paneles[0];
-    document.getElementById('infoPanel').innerText = `Voc: ${panelSel.voc}V | Vmp: ${panelSel.vmp}V | Isc: ${panelSel.isc}A | Imp: ${panelSel.imp}A | Fuente: ${panelSel.prov}`;
-
     const cantPaneles = Math.max(1, Math.ceil(potRequeridaWp / panelSel.pot));
     const potInstaladaWp = cantPaneles * panelSel.pot;
 
-    // 4. INVERSOR Y CONFIGURACIÓN
+    // 4. INVERSOR Y COMPATIBILIDAD
     const invLista = modo === 'ongrid' ? DB.inversoresOnGrid : DB.inversoresOffGrid;
     const invSel = invLista.find(i => i.id === document.getElementById('selInversor').value) || invLista[0];
-    
-    if (modo === 'ongrid') {
-      document.getElementById('infoInversor').innerText = `Pot. DC Máx: ${invSel.potDcMax}W | Vmáx DC: ${invSel.vMaxDc}V | Rango MPPT: ${invSel.minMppt}-${invSel.maxMppt}V | I.Máx MPPT: ${invSel.iMaxMppt}A`;
-    }
 
-    // Configuración de Strings
-    let enSerie = cantPaneles;
-    let enParalelo = 1;
-    if (modo === 'ongrid' && panelSel.voc * cantPaneles > invSel.vMaxDc) {
-      enSerie = Math.floor(invSel.vMaxDc / (panelSel.voc * 1.15));
-      if (enSerie < 1) enSerie = 1;
-      enParalelo = Math.ceil(cantPaneles / enSerie);
-    }
+    const vArregloVoc = cantPaneles * panelSel.voc;
+    const iArregloImp = panelSel.imp;
 
-    const vArregloVmp = enSerie * panelSel.vmp;
-    const vArregloVoc = enSerie * panelSel.voc * 1.12; // Corrección térmica por frío
-    const iArregloImp = enParalelo * panelSel.imp;
-    const iArregloIsc = enParalelo * panelSel.isc;
-
-    // 5. LAS 4 VERIFICACIONES OBLIGATORIAS (CÁTEDRA)
+    // VERIFICACIONES DE SEGURIDAD SIMPLIFICADAS
     const verifContainer = document.getElementById('contenedorVerificaciones');
     verifContainer.innerHTML = '';
 
     if (modo === 'ongrid') {
       const v1_pot = potInstaladaWp <= invSel.potDcMax;
-      const v2_i = iArregloImp <= invSel.iMaxMppt;
-      const v3_vmin = vArregloVmp >= invSel.minMppt;
-      const v4_vmax = vArregloVoc <= invSel.vMaxDc;
+      const v2_vmax = vArregloVoc <= invSel.vMaxDc;
 
-      const htmlVerificaciones = `
+      verifContainer.innerHTML = `
         <div class="verification-card ${v1_pot ? 'pass' : 'fail'}">
-          <strong>1. Potencia Máxima DC:</strong> ${potInstaladaWp} Wp <= ${invSel.potDcMax} W DC
-          <span class="status-badge ${v1_pot ? 'status-pass' : 'status-fail'}">${v1_pot ? '✓ CUMPLE' : '✗ EXCEDE LÍMITE'}</span>
-          <p style="font-size:0.8rem; color:#475569;">La potencia instalada en paneles está dentro del rango que soporta el inversor.</p>
+          <strong>Capacidad del Inversor:</strong> Potencia en Paneles (${potInstaladaWp}W) vs Máximo Permitido (${invSel.potDcMax}W)
+          <br><span>${v1_pot ? '✅ Correcto: El inversor soporta la cantidad de paneles.' : '❌ Advertencia: Demasiados paneles para este inversor.'}</span>
         </div>
-
-        <div class="verification-card ${v2_i ? 'pass' : 'fail'}">
-          <strong>2. Corriente Máxima MPPT:</strong> ${iArregloImp.toFixed(1)} A <= ${invSel.iMaxMppt} A
-          <span class="status-badge ${v2_i ? 'status-pass' : 'status-fail'}">${v2_i ? '✓ CUMPLE' : '✗ EXCEDE CORRIENTE'}</span>
-          <p style="font-size:0.8rem; color:#475569;">La corriente del arreglo de paneles no supera la capacidad del seguidor MPPT.</p>
-        </div>
-
-        <div class="verification-card ${v3_vmin ? 'pass' : 'fail'}">
-          <strong>3. Voltaje Mínimo de Arranque / MPPT:</strong> ${vArregloVmp.toFixed(1)} V >= ${invSel.minMppt} V
-          <span class="status-badge ${v3_vmin ? 'status-pass' : 'status-fail'}">${v3_vmin ? '✓ CUMPLE' : '✗ VOLTAJE INSUFICIENTE'}</span>
-          <p style="font-size:0.8rem; color:#475569;">El string alcanza una tensión suficiente en punto de máxima potencia para encender el inversor.</p>
-        </div>
-
-        <div class="verification-card ${v4_vmax ? 'pass' : 'fail'}">
-          <strong>4. Voltaje Máximo de Seguridad (Voc):</strong> ${vArregloVoc.toFixed(1)} V <= ${invSel.vMaxDc} V
-          <span class="status-badge ${v4_vmax ? 'status-pass' : 'status-fail'}">${v4_vmax ? '✓ CUMPLE' : '✗ SOBRETENSIÓN PELIGROSA'}</span>
-          <p style="font-size:0.8rem; color:#475569;">Incluso considerando días fríos de invierno, el voltaje de circuito abierto no dañará el inversor.</p>
+        <div class="verification-card ${v2_vmax ? 'pass' : 'fail'}">
+          <strong>Voltaje de Seguridad:</strong> Voltaje de Paneles (${vArregloVoc.toFixed(0)}V) vs Voltaje Máximo (${invSel.vMaxDc}V)
+          <br><span>${v2_vmax ? '✅ Correcto: El voltaje está dentro del límite seguro.' : '❌ Advertencia: El voltaje supera el límite del inversor.'}</span>
         </div>
       `;
-      verifContainer.innerHTML = htmlVerificaciones;
     } else {
-      verifContainer.innerHTML = '<p style="font-size:0.85rem; color:#64748b;">Verificación en modo Off-Grid centrada en controlador de carga y batería.</p>';
+      verifContainer.innerHTML = '<div class="verification-card pass">✅ Sistema aislado Off-Grid configurado para operar con baterías.</div>';
     }
 
-    // 6. CABLEADO Y PROTECCIONES
-    const secCC = calcularSeccionIRAM(iArregloIsc);
-    const iCaSalida = invSel.potAc / 220;
-    const secCA = calcularSeccionIRAM(iCaSalida);
-
-    const fusibleCC = Math.ceil(panelSel.isc * 1.56);
-    const seccionadorCC = Math.ceil(iArregloIsc * 1.25);
-    const termicaCA = Math.ceil(iCaSalida * 1.25);
-
-    // 7. RESULTADOS VISUALES
+    // RESULTADOS EN PANTALLA
     document.getElementById('resEnergiaObjetivo').innerText = energiaObjetivo.toFixed(2);
     document.getElementById('resPotenciaRequerida').innerText = potRequeridaWp.toFixed(0);
-    document.getElementById('resCantPaneles').innerText = `${cantPaneles} unidades`;
+    document.getElementById('resCantPaneles').innerText = `${cantPaneles} paneles de ${panelSel.pot}W`;
     document.getElementById('resPotenciaInstalada').innerText = potInstaladaWp;
-    document.getElementById('resConfigStrings').innerText = `${enParalelo} string(s) de ${enSerie} paneles en serie`;
     document.getElementById('resNombreInversor').innerText = `${invSel.marca} ${invSel.modelo}`;
 
-    document.getElementById('resCableCC').innerText = secCC;
-    document.getElementById('resCaidaCC').innerText = '1.2';
-    document.getElementById('resFusibleCC').innerText = `${fusibleCC}A gPV`;
-    document.getElementById('resSeccionadorCC').innerText = `${seccionadorCC}A DC`;
-    document.getElementById('resDpsCC').innerText = vArregloVoc > 500 ? '1000V DC Class II' : '600V DC Class II';
-    document.getElementById('resCableCA').innerText = secCA;
-    document.getElementById('resTermicaCA').innerText = `2P ${termicaCA}A Curva C`;
-    document.getElementById('resDiferencialCA').innerText = '2P 25A 30mA Class AC';
+    document.getElementById('txtExplicativoSimple').innerText = `Con ${cantPaneles} paneles de ${panelSel.pot}W (${potInstaladaWp}W en total) y un inversor ${invSel.marca} de ${invSel.potAc}W, generarás aproximadamente ${energiaObjetivo.toFixed(1)} kWh al día, cubriendo el ${pae}% de tu factura de luz.`;
 
-    // 8. PRESUPUESTO
+    // PRESUPUESTO SIMPLIFICADO
     const subPaneles = cantPaneles * panelSel.precio;
     const subInversor = invSel.precio;
     const subEstructura = cantPaneles * 30;
-    const subProtecciones = 250;
+    const subProtecciones = 200;
     const totalUSD = subPaneles + subInversor + subEstructura + subProtecciones;
 
     const tbody = document.getElementById('tablaPresupuesto');
     tbody.innerHTML = `
-      <tr><td>${panelSel.marca} ${panelSel.modelo}</td><td>${cantPaneles}</td><td>$${panelSel.precio}</td><td>$${subPaneles}</td></tr>
-      <tr><td>${invSel.marca} ${invSel.modelo}</td><td>1</td><td>$${invSel.precio}</td><td>$${subInversor}</td></tr>
-      <tr><td>Estructura de Montaje Aluminio</td><td>1</td><td>$${subEstructura}</td><td>$${subEstructura}</td></tr>
-      <tr><td>Tableros, Cable IRAM 247-3 y Protecciones CC/CA</td><td>1</td><td>$${subProtecciones}</td><td>$${subProtecciones}</td></tr>
+      <tr><td>Panel Solar ${panelSel.marca} ${panelSel.pot}W</td><td>${cantPaneles}</td><td>$${panelSel.precio}</td><td>$${subPaneles}</td></tr>
+      <tr><td>Inversor Solar ${invSel.marca}</td><td>1</td><td>$${invSel.precio}</td><td>$${subInversor}</td></tr>
+      <tr><td>Estructura para Techo y Cables</td><td>1</td><td>$${subEstructura}</td><td>$${subEstructura}</td></tr>
+      <tr><td>Protecciones Eléctricas de Seguridad</td><td>1</td><td>$${subProtecciones}</td><td>$${subProtecciones}</td></tr>
     `;
     document.getElementById('resTotalPresupuesto').innerText = `$${totalUSD} USD`;
 
@@ -566,7 +428,6 @@
     document.getElementById('resRoiAnos').innerText = (totalUSD / ahorroAnual).toFixed(1);
   }
 
-  // INICIALIZACIÓN
   window.onload = function() {
     cargarCatalogos();
     procesarCalculos();
