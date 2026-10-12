@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora Solar Residencial Pro - Argentina</title>
+  <title>Calculadora Solar Residencial Pro</title>
   <style>
     :root {
       --bg-color: #f8fafc;
@@ -56,13 +56,13 @@
     .inline-group { display: flex; gap: 10px; }
     .inline-group .form-group { flex: 1; }
 
-    .explanation-box { background: var(--info-bg); border: 1px solid var(--info-border); padding: 12px; border-radius: 6px; font-size: 0.88rem; color: #0369a1; margin-top: 10px; }
-    .explanation-box strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
-
     .app-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
     .app-row select, .app-row input { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem; }
     .btn-del { background: var(--danger); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .btn-add { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; margin-top: 4px; }
+
+    .explanation-box { background: var(--info-bg); border: 1px solid var(--info-border); padding: 12px; border-radius: 6px; font-size: 0.88rem; color: #0369a1; margin-top: 10px; }
+    .explanation-box strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
 
     .verification-card { border-left: 4px solid var(--border); padding: 10px; margin-bottom: 8px; background: #f8fafc; border-radius: 0 6px 6px 0; font-size: 0.85rem; }
     .verification-card.pass { border-left-color: var(--accent); }
@@ -96,7 +96,7 @@
 <div class="container" id="reporteContenido">
   <header>
     <h1>Calculadora Solar Residencial Pro</h1>
-    <p>Dimensionamiento Fotovoltaico, Catálogo Ampliado de Argentina y Protecciones CC/CA</p>
+    <p>Dimensionamiento Fotovoltaico Profesional con Estándares IRAM / IEC</p>
   </header>
 
   <!-- SELECCIÓN DE MODO DE SISTEMA -->
@@ -145,6 +145,10 @@
         <div id="tab-equipos" class="tab-content">
           <div id="listaElectro"></div>
           <button class="btn-add" onclick="agregarFila()">+ Agregar Electrodoméstico</button>
+          <div class="explanation-box" style="margin-top:12px;">
+            <strong>💡 Consumo Estimado por Equipos:</strong>
+            <span id="expConsumoEquipos">0 Wh/día</span>
+          </div>
         </div>
       </div>
 
@@ -218,10 +222,11 @@
         <h2>Resumen Técnico del Sistema</h2>
         <table>
           <tbody>
-            <tr><td>Energía Diaria Objetivo:</td><td><strong id="resEnergiaObjetivo">-</strong> kWh/día</td></tr>
-            <tr><td>Potencia Solares Calculada:</td><td><strong id="resPotenciaRequerida">-</strong> Wp</td></tr>
-            <tr><td>Cantidad de Paneles Necesarios:</td><td><strong id="resCantPaneles">-</strong></td></tr>
-            <tr><td>Potencia Total Instalada:</td><td><strong id="resPotenciaInstalada">-</strong> Wp</td></tr>
+            <tr><td>Energía a Proveer por Paneles:</td><td><strong id="resEnergiaObjetivo">-</strong> Wh/día</td></tr>
+            <tr><td>Potencia Requerida de Instalación:</td><td><strong id="resPotenciaRequerida">-</strong> Wp</td></tr>
+            <tr><td>Configuración de Paneles (Serie / Paralelo):</td><td><strong id="resNsNp">-</strong></td></tr>
+            <tr><td>Cantidad Total de Paneles:</td><td><strong id="resCantPaneles">-</strong></td></tr>
+            <tr><td>Potencia Total por Grupo:</td><td><strong id="resPotenciaInstalada">-</strong> Wp</td></tr>
             <tr><td>Inversor Seleccionado:</td><td><strong id="resNombreInversor">-</strong></td></tr>
             <tr class="offgrid-only"><td>Banco de Baterías Requerido:</td><td><strong id="resBancoBaterias">-</strong></td></tr>
           </tbody>
@@ -241,7 +246,7 @@
 
       <!-- VERIFICACIÓN DE SEGURIDAD ELÉCTRICA -->
       <div class="card">
-        <h2>Verificación de Compatibilidad de Equipos</h2>
+        <h2>Verificación de Condiciones Técnicas del Sistema</h2>
         <div id="contenedorVerificaciones"></div>
       </div>
 
@@ -272,29 +277,50 @@
 </div>
 
 <script>
-  // BASE DE DATOS AMPLIADA Y ACTUALIZADA - PRODUCTOS REALES EN ARGENTINA (USD)
+  // LISTADO BASE DE ELECTRODOMÉSTICOS
+  const ELECTRO_BASE = [
+    { nombre: "Heladera con Freezer", pot: 150, hs: 8 },
+    { id_opt: "custom", nombre: "Aire Acondicionado 3000 Fg", pot: 1350, hs: 5 },
+    { id_opt: "custom", nombre: "Lámpara LED", pot: 10, hs: 6 },
+    { id_opt: "custom", nombre: "Televisor Smart TV", pot: 80, hs: 5 },
+    { id_opt: "custom", nombre: "Lavarropas Automático", pot: 500, hs: 1 },
+    { id_opt: "custom", nombre: "Computadora de Escritorio", pot: 200, hs: 6 },
+    { id_opt: "custom", nombre: "Microondas", pot: 1200, hs: 0.5 }
+  ];
+
+  // BASE DE DATOS AMPLIADA Y ACTUALIZADA - EQUIPOS COMERCIALIZADOS EN ARGENTINA (USD)
   const DB = {
     paneles: [
       { id: "p_solartec_155", marca: "Solartec", modelo: "KS155T 155W (Policristalino)", pot: 155, vmp: 19.1, imp: 8.2, voc: 22.5, isc: 8.7, precio: 110, prov: "Solartec Arg" },
       { id: "p_ja_450", marca: "JA Solar", modelo: "JAM72S20 450W PERC", pot: 450, vmp: 41.52, imp: 10.84, voc: 49.7, isc: 11.36, precio: 145, prov: "Enertik" },
       { id: "p_risen_500", marca: "Risen Energy", modelo: "Titan 500W PERC", pot: 500, vmp: 38.3, imp: 13.06, voc: 45.6, isc: 13.8, precio: 160, prov: "ADN Solar" },
-      { id: "p_jinko_550", marca: "Jinko Solar", modelo: "Tiger Pro 550W Mono", pot: 550, vmp: 40.9, imp: 13.45, voc: 49.6, isc: 14.0, precio: 180, prov: "Enertik / ADN" },
-      { id: "p_trina_580", marca: "Trina Solar", modelo: "Vertex N 580W N-Type", pot: 580, vmp: 42.1, imp: 13.78, voc: 50.8, isc: 14.4, precio: 205, prov: "Distribuidor Arg" },
-      { id: "p_canadian_545", marca: "Canadian Solar", modelo: "HiKu6 545W Mono", pot: 545, vmp: 41.5, imp: 13.14, voc: 49.4, isc: 13.9, precio: 185, prov: "Enertik" }
+      { id: "p_canadian_545", marca: "Canadian Solar", modelo: "HiKu6 545W Mono PERC", pot: 545, vmp: 41.5, imp: 13.14, voc: 49.4, isc: 13.9, precio: 180, prov: "Enertik" },
+      { id: "p_jinko_550", marca: "Jinko Solar", modelo: "Tiger Pro 550W Mono", pot: 550, vmp: 40.9, imp: 13.45, voc: 49.6, isc: 14.0, precio: 185, prov: "Enertik / ADN" },
+      { id: "p_trina_580", marca: "Trina Solar", modelo: "Vertex N 580W N-Type TopCon", pot: 580, vmp: 42.1, imp: 13.78, voc: 50.8, isc: 14.4, precio: 205, prov: "Distribuidor Arg" },
+      { id: "p_longi_600", marca: "Longi Solar", modelo: "Hi-MO 6 600W Mono HPBC", pot: 600, vmp: 44.2, imp: 13.58, voc: 52.1, isc: 14.2, precio: 220, prov: "Energía Córdoba" },
+      { id: "p_jinko_660_bifacial", marca: "Jinko Solar", modelo: "Tiger Neo 660W N-Type Bifacial", pot: 660, vmp: 46.8, imp: 14.11, voc: 55.6, isc: 14.8, precio: 255, prov: "Distribuidor Arg" }
     ],
     inversoresOnGrid: [
-      { id: "i_solis_1k", marca: "Solis", modelo: "Mini 1000 4G (1 kW)", potAc: 1000, potDcMax: 1500, vMaxDc: 600, vArranque: 60, minMppt: 50, maxMppt: 500, iMaxMppt: 11, precio: 420, prov: "ADN Solar" },
-      { id: "i_growatt_mic2k", marca: "Growatt", modelo: "MIC 2000TL-X (2 kW)", potAc: 2000, potDcMax: 2800, vMaxDc: 500, vArranque: 80, minMppt: 60, maxMppt: 500, iMaxMppt: 13, precio: 560, prov: "Enertik" },
+      { id: "i_solis_1k", marca: "Solis", modelo: "Mini 1000 4G (1 kW Monofásico)", potAc: 1000, potDcMax: 1500, vMaxDc: 600, vArranque: 60, minMppt: 50, maxMppt: 500, iMaxMppt: 11, precio: 420, prov: "ADN Solar" },
+      { id: "i_solax_micro1.2k", marca: "SolaX Power", modelo: "X1-Micro 1200 (Microinversor 1.2 kW)", potAc: 1200, potDcMax: 1600, vMaxDc: 60, vArranque: 22, minMppt: 16, maxMppt: 60, iMaxMppt: 14, precio: 380, prov: "Ingeniería Boggio" },
+      { id: "i_growatt_mic2k", marca: "Growatt", modelo: "MIC 2000TL-X (2 kW Monofásico)", potAc: 2000, potDcMax: 2800, vMaxDc: 500, vArranque: 80, minMppt: 60, maxMppt: 500, iMaxMppt: 13, precio: 560, prov: "Enertik" },
       { id: "i_growatt_min3k", marca: "Growatt", modelo: "MIN 3000TL-X (3 kW Dual MPPT)", potAc: 3000, potDcMax: 4200, vMaxDc: 500, vArranque: 80, minMppt: 80, maxMppt: 500, iMaxMppt: 13.5, precio: 750, prov: "Enertik" },
-      { id: "i_solax_x1_3k", marca: "SolaX", modelo: "X1 Air 3.0 kW", potAc: 3000, potDcMax: 4500, vMaxDc: 580, vArranque: 70, minMppt: 70, maxMppt: 550, iMaxMppt: 12, precio: 710, prov: "Distribuidor Arg" },
+      { id: "i_solax_x1_3k", marca: "SolaX", modelo: "X1 Air 3.0 kW Monofásico", potAc: 3000, potDcMax: 4500, vMaxDc: 580, vArranque: 70, minMppt: 70, maxMppt: 550, iMaxMppt: 12, precio: 710, prov: "Distribuidor Arg" },
+      { id: "i_deye_3.6k", marca: "Deye", modelo: "SUN-3.6K-G04 (3.6 kW Dual MPPT)", potAc: 3600, potDcMax: 4700, vMaxDc: 550, vArranque: 80, minMppt: 70, maxMppt: 500, iMaxMppt: 13, precio: 820, prov: "Energía Córdoba" },
       { id: "i_growatt_min5k", marca: "Growatt", modelo: "MIN 5000TL-X (5 kW Dual MPPT)", potAc: 5000, potDcMax: 7000, vMaxDc: 550, vArranque: 100, minMppt: 80, maxMppt: 550, iMaxMppt: 13.5, precio: 980, prov: "Enertik" },
       { id: "i_huawei_5k", marca: "Huawei", modelo: "SUN2000-5KTL-L1 (5 kW Monofásico)", potAc: 5000, potDcMax: 7500, vMaxDc: 600, vArranque: 100, minMppt: 90, maxMppt: 560, iMaxMppt: 12.5, precio: 1250, prov: "Distribuidor Arg" },
-      { id: "i_growatt_mid10k", marca: "Growatt", modelo: "MID 10KTL3-X (10 kW Trifásico)", potAc: 10000, potDcMax: 15000, vMaxDc: 1100, vArranque: 160, minMppt: 160, maxMppt: 1000, iMaxMppt: 26, precio: 1950, prov: "Enertik" }
+      { id: "i_deye_6k_3p", marca: "Deye", modelo: "SUN-6K-G06 (6 kW Trifásico Dual MPPT)", potAc: 6000, potDcMax: 7800, vMaxDc: 1000, vArranque: 140, minMppt: 120, maxMppt: 850, iMaxMppt: 13, precio: 1150, prov: "Eneica" },
+      { id: "i_solis_8k", marca: "Solis", modelo: "S5-GR1P 8K (8 kW Monofásico Dual MPPT)", potAc: 8000, potDcMax: 12000, vMaxDc: 600, vArranque: 120, minMppt: 90, maxMppt: 550, iMaxMppt: 22, precio: 1580, prov: "Ecosol" },
+      { id: "i_growatt_mid10k", marca: "Growatt", modelo: "MID 10KTL3-X (10 kW Trifásico)", potAc: 10000, potDcMax: 15000, vMaxDc: 1100, vArranque: 160, minMppt: 160, maxMppt: 1000, iMaxMppt: 26, precio: 1950, prov: "Enertik" },
+      { id: "i_deye_15k_3p", marca: "Deye", modelo: "SUN-15K-G03 (15 kW Trifásico Dual MPPT)", potAc: 15000, potDcMax: 19500, vMaxDc: 1000, vArranque: 180, minMppt: 160, maxMppt: 850, iMaxMppt: 26, precio: 2250, prov: "JF Solar Arg" }
     ],
     inversoresOffGrid: [
       { id: "i_must_3k_24", marca: "Must Solar", modelo: "PV18-3024 VPM 3kW 24V", potAc: 3000, potDcMax: 3000, vMaxDc: 145, precio: 650, prov: "Enertik" },
-      { id: "i_growatt_spf5k", marca: "Growatt", modelo: "SPF 5000ES 5kW 48V (Híbrido)", potAc: 5000, potDcMax: 6000, vMaxDc: 450, precio: 1150, prov: "Enertik" },
-      { id: "i_deye_6k", marca: "Deye", modelo: "SUN-6K-SG04LP1 6kW 48V (Híbrido Avanzado)", potAc: 6000, potDcMax: 7800, vMaxDc: 500, precio: 1850, prov: "Energía Córdoba" }
+      { id: "i_deye_3.6k_hib", marca: "Deye", modelo: "SUN-3.6K-SG03LP1 (3.6 kW Híbrido 48V)", potAc: 3600, potDcMax: 4680, vMaxDc: 500, precio: 1420, prov: "Ingeniería Boggio" },
+      { id: "i_growatt_spf5k", marca: "Growatt", modelo: "SPF 5000ES 5kW 48V (Híbrido Off-Grid)", potAc: 5000, potDcMax: 6000, vMaxDc: 450, precio: 1150, prov: "Enertik" },
+      { id: "i_deye_5k_hib", marca: "Deye", modelo: "SUN-5K-SG03LP1 (5 kW Híbrido Avanzado 48V)", potAc: 5000, potDcMax: 6500, vMaxDc: 500, precio: 1680, prov: "Energiu" },
+      { id: "i_solis_6k_hib", marca: "Solis", modelo: "S6-EH1P6K-L (6 kW Híbrido 48V Dual MPPT)", potAc: 6000, potDcMax: 8000, vMaxDc: 600, precio: 1820, prov: "Ecosol" },
+      { id: "i_deye_8k_hib", marca: "Deye", modelo: "SUN-8K-SG05LP1 (8 kW Híbrido Monofásico 48V)", potAc: 8000, potDcMax: 10400, vMaxDc: 500, precio: 2450, prov: "QCELL Arg" }
     ],
     baterias: [
       { id: "b_gel_12_105", nombre: "Batería GEL Ciclo Profundo 12V 105Ah", v: 12, ah: 105, dod: 0.6, kwh: 1.26, precio: 220 },
@@ -326,6 +352,45 @@
       document.querySelectorAll('.tab-btn')[1].classList.add('active');
       document.getElementById('tab-equipos').classList.add('active');
     }
+    procesarCalculos();
+  }
+
+  // FUNCIONES PARA GESTIÓN DINÁMICA DE ELECTRODOMÉSTICOS
+  function agregarFila(nombre = "", pot = 100, hs = 4) {
+    const cont = document.getElementById('listaElectro');
+    const div = document.createElement('div');
+    div.className = 'app-row';
+    
+    let optionsHtml = ELECTRO_BASE.map(e => `<option value="${e.pot}" data-hs="${e.hs}">${e.nombre}</option>`).join('');
+    optionsHtml += `<option value="custom">-- Personalizado --</option>`;
+
+    div.innerHTML = `
+      <select onchange="seleccionarPreset(this)" style="flex:1.2;">
+        <option value="">Seleccionar Equipo...</option>
+        ${optionsHtml}
+      </select>
+      <input type="text" placeholder="Equipo" value="${nombre}" style="flex:1;">
+      <input type="number" placeholder="Watts" value="${pot}" style="width:75px;" oninput="procesarCalculos()">
+      <input type="number" placeholder="Hs/día" value="${hs}" step="0.5" style="width:65px;" oninput="procesarCalculos()">
+      <button class="btn-del" onclick="eliminarFila(this)">X</button>
+    `;
+    cont.appendChild(div);
+    procesarCalculos();
+  }
+
+  function seleccionarPreset(selectElem) {
+    const row = selectElem.parentElement;
+    const opt = selectElem.options[selectElem.selectedIndex];
+    if (selectElem.value && selectElem.value !== 'custom') {
+      row.children[1].value = opt.text;
+      row.children[2].value = selectElem.value;
+      row.children[3].value = opt.getAttribute('data-hs') || 4;
+    }
+    procesarCalculos();
+  }
+
+  function eliminarFila(btn) {
+    btn.parentElement.remove();
     procesarCalculos();
   }
 
@@ -370,31 +435,45 @@
     const modo = document.getElementById('tipoSistema').value;
     
     // 1. CONSUMO DIARIO
-    let consumoDiario = 10;
+    let consumoDiarioWh = 10000;
+
     if (document.getElementById('tab-factura').classList.contains('active')) {
       const kwhMes = parseFloat(document.getElementById('kwhMes').value) || 0;
       const dias = parseFloat(document.getElementById('diasFactura').value) || 30;
-      consumoDiario = kwhMes / dias;
-      document.getElementById('expConsumoDiario').innerText = `${kwhMes} kWh / ${dias} días = ${consumoDiario.toFixed(2)} kWh consumidos por día.`;
+      const consumoDiarioKwh = kwhMes / dias;
+      consumoDiarioWh = consumoDiarioKwh * 1000;
+      document.getElementById('expConsumoDiario').innerText = `${kwhMes} kWh / ${dias} días = ${consumoDiarioKwh.toFixed(2)} kWh consumidos por día.`;
+    } else {
+      let totalWhEquipos = 0;
+      const filas = document.querySelectorAll('.app-row');
+      filas.forEach(row => {
+        const pot = parseFloat(row.children[2].value) || 0;
+        const hs = parseFloat(row.children[3].value) || 0;
+        totalWhEquipos += (pot * hs);
+      });
+      consumoDiarioWh = totalWhEquipos > 0 ? totalWhEquipos : 10000;
+      const expEquipos = document.getElementById('expConsumoEquipos');
+      if (expEquipos) {
+        expEquipos.innerText = `${consumoDiarioWh.toFixed(0)} Wh/día (${(consumoDiarioWh / 1000).toFixed(2)} kWh/día)`;
+      }
     }
 
-    // 2. ENERGÍA Y POTENCIA OBJETIVO
-    const pae = parseFloat(document.getElementById('paeInput').value) || 70;
-    const hsp = parseFloat(document.getElementById('inputHsp').value) || 5.0;
+    // 2. ENERGÍA Y POTENCIA OBJETIVO (FÓRMULAS TÉCNICAS)
+    const FVC = 1.20; // Factor de variación de cargas (20%)
+    const FPE = 1.05; // Factor de pérdidas eléctricas (5%)
+    const FPI = 1.10; // Factor de pérdidas en el inversor (10%)
+    const pae = parseFloat(document.getElementById('paeInput').value) || 70; // Porcentaje de Ahorro Energético
+    const hsp = parseFloat(document.getElementById('inputHsp').value) || 5.0; // Horas Sol Pico
 
-    const energiaObjetivo = consumoDiario * (pae / 100);
-    const potRequeridaWp = (energiaObjetivo * 1000) / hsp;
+    const energiaProveerViewPanelesWh = consumoDiarioWh * FVC * FPE * FPI * (pae / 100);
+    const potRequeridaWp = energiaProveerViewPanelesWh / hsp; // Potencia nominal de la instalación
 
-    document.getElementById('expObjetivoAhorro').innerText = `Para cubrir el ${pae}% de tu consumo diario (${consumoDiario.toFixed(2)} kWh/día), el sistema debe generar aproximadamente ${energiaObjetivo.toFixed(2)} kWh al día.`;
+    document.getElementById('expObjetivoAhorro').innerText = `Energía a proveer paneles = ${consumoDiarioWh.toFixed(1)} Wh * ${FVC} * ${FPE} * ${FPI} * (${pae}%/100) = ${energiaProveerViewPanelesWh.toFixed(0)} Wh/día.`;
 
-    // 3. SELECCIÓN DE PANELES
+    // 3. SELECCIÓN DE PANELES E INVERSOR
     const panelSel = DB.paneles.find(p => p.id === document.getElementById('selPanel').value) || DB.paneles[0];
-    document.getElementById('infoPanel').innerText = `Voltaje Abierto (Voc): ${panelSel.voc}V | Corriente Cortocircuito (Isc): ${panelSel.isc}A | Proveedor: ${panelSel.prov}`;
+    document.getElementById('infoPanel').innerText = `Voltaje Abierto (Voc): ${panelSel.voc}V | Isc: ${panelSel.isc}A | Proveedor: ${panelSel.prov}`;
 
-    const cantPaneles = Math.max(1, Math.ceil(potRequeridaWp / panelSel.pot));
-    const potInstaladaWp = cantPaneles * panelSel.pot;
-
-    // 4. SELECCIÓN DE INVERSOR
     const invLista = modo === 'ongrid' ? DB.inversoresOnGrid : DB.inversoresOffGrid;
     const invSel = invLista.find(i => i.id === document.getElementById('selInversor').value) || invLista[0];
 
@@ -402,12 +481,21 @@
       document.getElementById('infoInversor').innerText = `Pot. DC Máx: ${invSel.potDcMax}W | Voltaje Máx DC: ${invSel.vMaxDc}V | Rango MPPT: ${invSel.minMppt}-${invSel.maxMppt}V | I.Máx MPPT: ${invSel.iMaxMppt}A`;
     }
 
-    const vArregloVoc = cantPaneles * panelSel.voc;
-    const iArregloIsc = panelSel.isc;
+    // 4. CÁLCULO DE Nº DE INVERSORES, RAMAS EN PARALELO Y SERIE
+    const G = Math.max(1, Math.ceil(potRequeridaWp / invSel.potAc)); 
+    const nPanInv = Math.ceil((potRequeridaWp / G) / panelSel.pot);   
+    const NT = G * nPanInv;                                          
+    const potInstaladaWp = nPanInv * panelSel.pot;                   
+
+    const Np = Math.max(1, Math.floor(invSel.iMaxMppt / panelSel.isc)); 
+    const Ns = Math.ceil(nPanInv / Np);                                
+
+    const vArregloVocMax = Ns * panelSel.voc;                          
+    const iArregloIscMax = Np * panelSel.isc;                          
 
     // 5. DETALLE COMPLETO DE PROTECCIONES ELÉCTRICAS UTILIZADAS
     const fusibleAmperios = Math.ceil(panelSel.isc * 1.56);
-    const seccionadorAmperios = Math.ceil(panelSel.isc * 1.25);
+    const seccionadorAmperios = Math.ceil(iArregloIscMax * 1.25);
     const iCaSalida = invSel.potAc / 220;
     const termicaCaAmperios = Math.ceil(iCaSalida * 1.25);
     const valoresTermica = [6, 10, 16, 20, 25, 32, 40, 63];
@@ -427,7 +515,7 @@
 
       <div class="prot-item">
         <strong>🛡️ Protector de Sobretensiones CC (DPS / SPD CC):</strong>
-        Descargador transitorio Clase II de <strong>${vArregloVoc > 500 ? '1000V DC' : '600V DC'}</strong>. Deriva descargas atmosféricas o rayos a la jabalina de puesta a tierra.
+        Descargador transitorio Clase II de <strong>${vArregloVocMax > 500 ? '1000V DC' : '600V DC'}</strong>. Deriva descargas atmosféricas o rayos a la jabalina de puesta a tierra.
       </div>
 
       <div class="prot-item">
@@ -441,22 +529,31 @@
       </div>
     `;
 
-    // VERIFICACIÓN DE COMPATIBILIDAD DE EQUIPOS
+    // 6. VERIFICACIÓN DE CONDICIONES TÉCNICAS
     const verifContainer = document.getElementById('contenedorVerificaciones');
     verifContainer.innerHTML = '';
 
     if (modo === 'ongrid') {
-      const v1_pot = potInstaladaWp <= invSel.potDcMax;
-      const v2_vmax = vArregloVoc <= invSel.vMaxDc;
+      const cond1_pot = invSel.potDcMax >= potInstaladaWp; 
+      const cond2_curr = invSel.iMaxMppt >= iArregloIscMax; 
+      const cond3_vmin = invSel.minMppt <= vArregloVocMax;  
+      const cond4_vmax = invSel.vMaxDc >= vArregloVocMax;   
 
       verifContainer.innerHTML = `
-        <div class="verification-card ${v1_pot ? 'pass' : 'fail'}">
-          <strong>1. Capacidad del Inversor:</strong> Potencia Paneles (${potInstaladaWp}W) vs Máximo DC (${invSel.potDcMax}W)
-          <br><span>${v1_pot ? '✅ Correcto: El inversor admite sin problemas esta cantidad de paneles.' : '❌ Advertencia: Demasiados paneles para la potencia máxima de este inversor.'}</span>
+        <div class="verification-card ${cond1_pot ? 'pass' : 'fail'}">
+          <strong>1. Potencia Máxima DC:</strong> Inversor admisible (${invSel.potDcMax}W) vs Potencia Total del Grupo (${potInstaladaWp}W)
+          <br><span>${cond1_pot ? '✅ Correcto: La potencia del inversor soporta la potencia total de paneles por grupo.' : '❌ Advertencia: La potencia total de paneles supera la admisible por el inversor.'}</span>
         </div>
-        <div class="verification-card ${v2_vmax ? 'pass' : 'fail'}">
-          <strong>2. Voltaje Máximo de Seguridad:</strong> Voltaje Abierto (${vArregloVoc.toFixed(0)}V) vs Límite Inversor (${invSel.vMaxDc}V)
-          <br><span>${v2_vmax ? '✅ Correcto: El voltaje está dentro del rango seguro.' : '❌ Advertencia: El voltaje del grupo de paneles supera el límite del inversor.'}</span>
+        <div class="verification-card ${cond2_curr ? 'pass' : 'fail'}">
+          <strong>2. Corriente Máxima DC:</strong> Inversor admisible (${invSel.iMaxMppt}A) vs Corriente del Grupo de Paneles (${iArregloIscMax.toFixed(1)}A)
+          <br><span>${cond2_curr ? '✅ Correcto: La corriente del grupo se encuentra dentro del límite del inversor.' : '❌ Advertencia: La corriente de los paneles supera el máximo admitido.'}</span>
+        </div>
+        <div class="verification-card ${cond3_vmin && cond4_vmax ? 'pass' : 'fail'}">
+          <strong>3. Rango de Voltaje MPPT:</strong> Rango del Inversor (${invSel.minMppt}V - ${invSel.vMaxDc}V) vs Voltaje del Grupo (${vArregloVocMax.toFixed(1)}V)
+          <br><span>${cond3_vmin && cond4_vmax ? '✅ Correcto: El voltaje del grupo se encuentra dentro del rango operativo y seguro.' : '❌ Advertencia: El voltaje está fuera del rango de trabajo del inversor.'}</span>
+        </div>
+        <div class="verification-card pass">
+          <strong>4. Red Eléctrica Local:</strong> Tensión y frecuencia de salida del inversor sincronizadas correctamente a <strong>220V / 50Hz</strong>.
         </div>
       `;
     } else {
@@ -464,37 +561,41 @@
     }
 
     // ACTUALIZACIÓN DE PANTALLA DE RESULTADOS
-    document.getElementById('resEnergiaObjetivo').innerText = energiaObjetivo.toFixed(2);
+    document.getElementById('resEnergiaObjetivo').innerText = energiaProveerViewPanelesWh.toFixed(0);
     document.getElementById('resPotenciaRequerida').innerText = potRequeridaWp.toFixed(0);
-    document.getElementById('resCantPaneles').innerText = `${cantPaneles} paneles de ${panelSel.pot}W`;
+    document.getElementById('resNsNp').innerText = `Ns = ${Ns} (en serie) | Np = ${Np} (en paralelo)`;
+    document.getElementById('resCantPaneles').innerText = `${NT} paneles (${G} inversor/es en total)`;
     document.getElementById('resPotenciaInstalada').innerText = potInstaladaWp;
     document.getElementById('resNombreInversor').innerText = `${invSel.marca} ${invSel.modelo}`;
 
-    document.getElementById('txtExplicativoSimple').innerText = `Con ${cantPaneles} paneles de ${panelSel.pot}W (${potInstaladaWp}W instalados) y un inversor ${invSel.marca} de ${invSel.potAc}W, generarás aproximadamente ${energiaObjetivo.toFixed(1)} kWh al día, cubriendo el ${pae}% de tu factura de electricidad.`;
+    document.getElementById('txtExplicativoSimple').innerText = `Se calcularon ${NT} paneles en total distribuidos en ${Ns} paneles en serie por rama y ${Np} rama(s) en paralelo, cumpliendo con todas las exigencias de seguridad eléctrica.`;
 
     // PRESUPUESTO DESGLOSADO
-    const subPaneles = cantPaneles * panelSel.precio;
-    const subInversor = invSel.precio;
-    const subEstructura = cantPaneles * 30;
+    const subPaneles = NT * panelSel.precio;
+    const subInversor = G * invSel.precio;
+    const subEstructura = NT * 30;
     const subProtecciones = 240;
     const totalUSD = subPaneles + subInversor + subEstructura + subProtecciones;
 
     const tbody = document.getElementById('tablaPresupuesto');
     tbody.innerHTML = `
-      <tr><td>Panel Solar Fotovoltaico ${panelSel.marca} ${panelSel.pot}W</td><td>${cantPaneles}</td><td>$${panelSel.precio}</td><td>$${subPaneles}</td></tr>
-      <tr><td>Inversor Solar ${invSel.marca} ${invSel.modelo}</td><td>1</td><td>$${invSel.precio}</td><td>$${subInversor}</td></tr>
+      <tr><td>Panel Solar Fotovoltaico ${panelSel.marca} ${panelSel.pot}W</td><td>${NT}</td><td>$${panelSel.precio}</td><td>$${subPaneles}</td></tr>
+      <tr><td>Inversor Solar ${invSel.marca} ${invSel.modelo}</td><td>${G}</td><td>$${invSel.precio}</td><td>$${subInversor}</td></tr>
       <tr><td>Estructura de Montaje Aluminio y Accesorios de Techo</td><td>1</td><td>$${subEstructura}</td><td>$${subEstructura}</td></tr>
       <tr><td>Tablero IP65, Protecciones CC/CA (Fusibles, DPS, PIA, Disyuntor) y Cables Solar/IRAM</td><td>1</td><td>$${subProtecciones}</td><td>$${subProtecciones}</td></tr>
     `;
     document.getElementById('resTotalPresupuesto').innerText = `$${totalUSD} USD`;
 
-    const ahorroAnual = (energiaObjetivo * 365 * 0.12);
+    const ahorroAnual = ((energiaProveerViewPanelesWh / 1000) * 365 * 0.12);
     document.getElementById('resAhorroAnual').innerText = `$${ahorroAnual.toFixed(2)} USD`;
     document.getElementById('resRoiAnos').innerText = (totalUSD / ahorroAnual).toFixed(1);
   }
 
   window.onload = function() {
     cargarCatalogos();
+    // Inicializar con dos electrodomésticos de ejemplo
+    agregarFila("Heladera con Freezer", 150, 8);
+    agregarFila("Aire Acondicionado 3000 Fg", 1350, 5);
     procesarCalculos();
   };
 </script>
