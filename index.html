@@ -138,7 +138,7 @@
 
           <div class="explanation-box">
             <strong>💡 Tu Consumo Diario Promedio:</strong>
-            <span id="expConsumoDiario">300 kWh / 30 días = 10.00 kWh al día.</span>
+            <span id="expConsumoDiario">Calculando promedio diario...</span>
           </div>
         </div>
 
@@ -154,7 +154,7 @@
 
       <!-- 2. UBICACIÓN Y OBJETIVO DE AHORRO -->
       <div class="card">
-        <h2>2. Ubicación y Porcentaje de Ahorro</h2>
+        <h2>2. Ubicación y Cobertura Deseada</h2>
         
         <div class="inline-group">
           <div class="form-group">
@@ -179,8 +179,8 @@
         </div>
 
         <div class="explanation-box">
-          <strong>🎯 Objetivo de Generación:</strong>
-          <span id="expObjetivoAhorro">Se diseñará el sistema para aportar el 70% de tu energía diaria necesaria.</span>
+          <strong>🎯 Objetivo del Campo Solar:</strong>
+          <span id="expObjetivoAhorro">Calculando propuesta de generación...</span>
         </div>
       </div>
 
@@ -442,7 +442,7 @@
       const dias = parseFloat(document.getElementById('diasFactura').value) || 30;
       const consumoDiarioKwh = kwhMes / dias;
       consumoDiarioWh = consumoDiarioKwh * 1000;
-      document.getElementById('expConsumoDiario').innerText = `${kwhMes} kWh / ${dias} días = ${consumoDiarioKwh.toFixed(2)} kWh consumidos por día.`;
+      document.getElementById('expConsumoDiario').innerText = `Consumo promedio: ${consumoDiarioKwh.toFixed(2)} kWh al día (${consumoDiarioWh.toFixed(0)} Wh/día).`;
     } else {
       let totalWhEquipos = 0;
       const filas = document.querySelectorAll('.app-row');
@@ -458,17 +458,23 @@
       }
     }
 
-    // 2. ENERGÍA Y POTENCIA OBJETIVO (FÓRMULAS TÉCNICAS)
+    // 2. CÁLCULOS INTRÍNSECOS (MATEMÁTICA RIGUROSA EN SEGUNDO PLANO)
     const FVC = 1.20; // Factor de variación de cargas (20%)
     const FPE = 1.05; // Factor de pérdidas eléctricas (5%)
     const FPI = 1.10; // Factor de pérdidas en el inversor (10%)
     const pae = parseFloat(document.getElementById('paeInput').value) || 70; // Porcentaje de Ahorro Energético
     const hsp = parseFloat(document.getElementById('inputHsp').value) || 5.0; // Horas Sol Pico
 
+    // Cálculo interno de energía objetivo considerando pérdidas
     const energiaProveerViewPanelesWh = consumoDiarioWh * FVC * FPE * FPI * (pae / 100);
-    const potRequeridaWp = energiaProveerViewPanelesWh / hsp; // Potencia nominal de la instalación
 
-    document.getElementById('expObjetivoAhorro').innerText = `Energía a proveer paneles = ${consumoDiarioWh.toFixed(1)} Wh * ${FVC} * ${FPE} * ${FPI} * (${pae}%/100) = ${energiaProveerViewPanelesWh.toFixed(0)} Wh/día.`;
+    // Cálculo interno de potencia requerida: P_inst = E_prov / (HSP x 0.7)
+    const potRequeridaWp = energiaProveerViewPanelesWh / (hsp * 0.7);
+
+    // Explicación visual limpia y libre de fórmulas complicadas
+    const kwhSolarDia = (energiaProveerViewPanelesWh / 1000).toFixed(1);
+    const kwpInstalar = (potRequeridaWp / 1000).toFixed(2);
+    document.getElementById('expObjetivoAhorro').innerText = `Para cubrir el ${pae}% de tu consumo diario considerando las pérdidas reales del sistema, los paneles deberán generar ${kwhSolarDia} kWh al día. Esto requiere una potencia instalada de aproximadamente ${kwpInstalar} kWp (${potRequeridaWp.toFixed(0)} Wp).`;
 
     // 3. SELECCIÓN DE PANELES E INVERSOR
     const panelSel = DB.paneles.find(p => p.id === document.getElementById('selPanel').value) || DB.paneles[0];
@@ -568,7 +574,7 @@
     document.getElementById('resPotenciaInstalada').innerText = potInstaladaWp;
     document.getElementById('resNombreInversor').innerText = `${invSel.marca} ${invSel.modelo}`;
 
-    document.getElementById('txtExplicativoSimple').innerText = `Se calcularon ${NT} paneles en total distribuidos en ${Ns} paneles en serie por rama y ${Np} rama(s) en paralelo, cumpliendo con todas las exigencias de seguridad eléctrica.`;
+    document.getElementById('txtExplicativoSimple').innerText = `Para cubrir tu necesidad energética se instalarán ${NT} paneles fotovoltaicos (${panelSel.pot}W cada uno). Se conectarán en ${Np} grupo(s) en paralelo de ${Ns} paneles en serie cada uno, garantizando máxima eficiencia y seguridad.`;
 
     // PRESUPUESTO DESGLOSADO
     const subPaneles = NT * panelSel.precio;
